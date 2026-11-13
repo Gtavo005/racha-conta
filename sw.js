@@ -1,5 +1,5 @@
 /* Racha Conta: guarda o app para abrir sem internet. Para publicar uma versao nova, mude o numero em VERSAO. */
-const VERSAO = 'racha-conta-v1';
+const VERSAO = 'racha-conta-v2';
 const BASE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 const EXTERNOS = /(^|\.)(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|fonts\.googleapis\.com|fonts\.gstatic\.com)$/;
 

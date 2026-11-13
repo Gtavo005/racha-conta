@@ -448,6 +448,19 @@ function pixFor(x){
   return pixPayload({key:pixKey(),name:nm,city:S.pix.city,cents:x.total});
 }
 
+/* ================= Pix do cafe (apoio ao app) ================= */
+const CAFE={key:'05020329282',name:'GUSTAVO CORREIA DA SILVA',city:'JI PARANA'};
+const CAFE_CODE=pixPayload({key:CAFE.key,name:CAFE.name,city:CAFE.city,cents:0});
+function cafeHTML(){
+  const svg=qrSvg(CAFE_CODE);
+  return '<h2 class="h2">Gostou do Racha Conta?</h2>'+
+    '<p class="muted">É grátis e feito pelo Gustavo. Se ajudou na mesa, pague um café. Você escolhe o valor.</p>'+
+    '<details data-qr="cafe"'+(openQR.has('cafe')?' open':'')+'><summary>Pagar um café com Pix</summary>'+
+      '<div class="qrwrap">'+(svg?'<div class="qrbox">'+svg+'</div>':'<p class="muted">O QR Code não carregou agora. Use o Pix copia e cola abaixo.</p>')+
+      '<p class="code mono">'+esc(CAFE_CODE)+'</p>'+
+      '<button class="btn btn-ghost btn-block" data-act="copy-cafe">'+ico('copy')+'Copiar Pix</button></div></details>';
+}
+
 /* ================= Telas ================= */
 function personRow(p,i){
   return '<div class="prow" data-id="'+p.id+'">'+
@@ -522,7 +535,8 @@ function vDividir(){
       '<p class="hint">Se alguém da mesa pagou tudo, escolha o nome. Essa pessoa não recebe QR Code e os outros pagam para ela.</p>'+
     '</div></details>'+
   '<section class="card" id="sumbar"></section>'+
-  '<div class="stack" id="notes"></div>';
+  '<div class="stack" id="notes"></div>'+
+  '<section class="card" id="cafe"></section>';
 }
 
 /* ================= Partes que se atualizam ao digitar ================= */
@@ -601,6 +615,7 @@ function refreshDerived(){
   if(tab==='dividir'){
     const c=compute(S);
     const sb=$('#sumbar');if(sb)sb.innerHTML=sumbarHTML(c);
+    const cf=$('#cafe');if(cf&&!cf.querySelector('details[open]'))cf.innerHTML=cafeHTML();
     const nt=$('#notes');if(nt)nt.innerHTML=c.people.map((x,i)=>notaHTML(x,i,c)).join('');
     const h=keyHintHTML(),kh=$('#keyhint');if(kh){kh.className=h[0];kh.textContent=h[1];}
     const ps=$('#pixstate');if(ps){const r=pixReady();ps.textContent=r?'Pronta':'Falta preencher';ps.className='pill'+(r?' ok':'');}
@@ -694,6 +709,9 @@ view.addEventListener('click',async e=>{
     if(!code)return;
     const ok=await copyText(code);
     toast(ok?'Pix copia e cola copiado':'Não consegui copiar. Abra o QR Code e toque no código para copiar.');
+  }else if(act==='copy-cafe'){
+    const ok=await copyText(CAFE_CODE);
+    toast(ok?'Pix copiado. Obrigado pelo café!':'Não consegui copiar. Toque no código para copiar.');
   }else if(act==='open-pix'){
     const d=$('#pixd');if(d){d.open=true;d.scrollIntoView({block:'start'});const k=$('#pixkey');if(k)k.focus();}
   }
@@ -708,6 +726,15 @@ $('#themeBtn').addEventListener('click',()=>{
   document.documentElement.setAttribute('data-theme',next);
   try{localStorage.setItem('racha-theme',next);}catch(e){}
 });
+
+/* ================= Contador de visitas (GoatCounter) ================= */
+/* Cole entre as aspas o código que você escolheu no goatcounter.com. Vazio = contador desligado. */
+const GOATCOUNTER_CODE='';
+if(GOATCOUNTER_CODE&&/^https?:$/.test(location.protocol)){
+  const gc=document.createElement('script');
+  gc.async=true;gc.dataset.goatcounter='https://'+GOATCOUNTER_CODE+'.goatcounter.com/count';gc.src='//gc.zgo.at/count.js';
+  document.head.appendChild(gc);
+}
 
 /* ================= Início ================= */
 render();
